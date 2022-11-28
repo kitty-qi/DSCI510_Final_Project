@@ -105,5 +105,12 @@ temperature_df = pd.concat(
 #save all the temperature data for 2021 into a csv file
 temperature_df.to_csv("temperature_data.csv",index = False)
 
+#collect covid data
+covid_df = pd.read_csv("covid19cases_test.csv")
+#covid_df = covid_df[covid_df["area"] == "Los Angeles"]
+covid_df = covid_df.loc[19848:20212,:]
+# save covid data for los angeles in 2021 into a csv file
+covid_df.to_csv("covid_2021_losangeles_data.csv",index = False)
+
 
 
