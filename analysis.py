@@ -6,29 +6,6 @@ from scipy import stats
 from scipy import optimize
 #%matplotlib inline
 
-'''
-covid_df = pd.read_csv("covid19cases_test.csv")
-covid_df = covid_df[covid_df["area"] == "Los Angeles"]
-covid_df = covid_df.loc[19848:20212,:]
-
-covid_df.to_csv("covid_2021_losangeles_data.csv",index = False)
-
-
-["date","area","cases"]
-print(covid_df.head())
-print(covid_df.tail())
-
-covid_df = pd.read_csv("covid_2021_losangeles_data.csv")
-temperature_df = pd.read_csv("temperature_data.csv")
-df_1 = temperature_df
-#df_1 = df_1.set_index("Date time")
-df_1 = df_1.drop(["Address","Date time"],axis=1)
-df_1 = pd.concat([covid_df.loc[:,["date"]],df_1], axis=1)
-df_1 = df_1.rename({"Maximum Temperature":"TMAX"},axis=1)
-df_1 = df_1.rename({"Minimum Temperature":"TMIN"},axis=1)
-df_1 = df_1.rename({"date":"DATE"},axis=1)
-df_1.to_csv("temperature_1.csv",index = False)
-'''
 
 covid_df = pd.read_csv("covid_2021_losangeles_data.csv")
 temperature_df = pd.read_csv("temperature_data.csv")
@@ -41,6 +18,7 @@ f_df = pd.concat([temperature_df.loc[:,["Date time","Minimum Temperature","Maxim
 
 f_df = f_df.set_index("Date time")
 
+# Daily new cases vs daily temperature figure
 fig, (axis1,axis2) = plt.subplots(1,2)
 
 axis1.plot(f_df["Minimum Temperature"],f_df[["cases"]],"bo")
@@ -52,16 +30,26 @@ axis2.set(xlabel = "Maximum Temperature", ylabel = "Daily New Cases")
 fig.suptitle('Daily New Cases vs Daily Temperature')
 plt.tight_layout()
 plt.show()
+plt.savefig("cases_vs_temperature.png")
+
+
 # nonlinear relationship, some outliers
 
 f_df["cases"].describe()
 
 plt.hist(f_df[["cases"]],bins = 20)
+plt.xlabel("Daily New Cases")
+plt.ylabel("Frequency")
+plt.title("Daily New Cases Historgram")
+plt.savefig("cases_histogram.png")
+#plt.close()
 # samples n = 365
-#The heights of the bars tell us how many data points are in each bin.
+# The heights of the bars tell us how many data points are in each bin.
 
 plt.figure(figsize=(7, 5))
 sns.boxplot(data=f_df["cases"])
+plt.title("Covid Daily New Cases Boxplot")
+plt.savefig("Covid Daily New Cases Boxplot.png")
 # data lower than 50% of the whole cases numbers are close to the min
 # many outliers
 
