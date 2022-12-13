@@ -150,13 +150,14 @@ ttest,pval = ttest_ind(f_df["Minimum Temperature"],f_df["cases"],equal_var = Fal
 print(f"The statistic t value is {ttest} and the p-value is {pval}")
 # The statistic t value is -10.074685356004688 and the p-value is 3.21249495126667e-21
 
-# factorial ANOVA https://www.reneshbedre.com/blog/anova.html
+# cannot use factorial ANOVA since no treatment groups/levels in this cases 
+# https://www.reneshbedre.com/blog/anova.html
+
 f2_df = pd.concat([temperature_df.loc[:,["Date time","Minimum Temperature","Dew Point","Relative Humidity"]],\
     covid_df2], axis=1)
 
 f2_df = f2_df.set_index("Date time")
 f2_df = f2_df.rename(columns = {"Minimum Temperature": "Minimum_Temperature", "Dew Point":"Dew_Point","Relative Humidity":"Relative_Humidity"})
-f2_df.head()
 
 # form correlation matrix
 matrix = f2_df.corr()
@@ -164,7 +165,7 @@ print("Correlation matrix is : ")
 print(matrix)
 '''
 Correlation matrix is : 
-                     Minimum_Temperature  Dew_Point  Relative_Humidity  
+                        Minimum_Temperature  Dew_Point  Relative_Humidity  
 Minimum_Temperature             1.000000   0.787565           0.209791   
 Dew_Point                       0.787565   1.000000           0.724369   
 Relative_Humidity               0.209791   0.724369           1.000000   
@@ -175,15 +176,50 @@ minimum temperature and relative humidity weakly correlated
 dew point and relative humidity higly correlated
 can add relative humidity into the model
 '''
+f2_df['Relative_Humidity'].isnull().values.any()
+
+# https://joelcarlson.github.io/2016/05/10/Exploring-Interactions/ 
+# Linear Regression Coefficients and Interactions
+f2_df.loc[:,"min2"] = f2_df.Minimum_Temperature * f2_df.Minimum_Temperature
+
+# initial polynomial model for only minimum temperature variable
+f2_df.loc[:,"min_humidity"] = f2_df.Minimum_Temperature * f2_df.Relative_Humidity
+model = ols(formula='cases ~ min2 + Minimum_Temperature   ', data=f2_df).fit()
+summary = model.summary()
+print(summary)
+
+# model adding relative humidity
+model = ols(formula='cases ~ min2 + Minimum_Temperature + Relative_Humidity   ', data=f2_df).fit()
+summary = model.summary()
+print(summary)
+
+# model adding relative humidity and the interactoin effect of minimum temperature and relative humidity
+model = ols(formula='cases ~ min2 + Minimum_Temperature + Relative_Humidity  + min_humidity ', data=f2_df).fit()
+summary = model.summary()
+print(summary)
 '''
-f2_df = f2_df.loc[:,["Minimum_Temperature","Relative_Humidity","cases"]]
+                coef    std err t   P>|t|   [0.025  0.975]
+Intercept   5.039e+04   1.5e+04 3.350   0.001   2.08e+04    8e+04
+min2    25.0587 4.038   6.205   0.000   17.117  33.000
+Minimum_Temperature -2306.0375  468.955 -4.917  0.000   -3228.273   -1383.802
+Relative_Humidity   682.8575    151.159 4.517   0.000   385.592 980.123
+min_humidity    -11.6713    2.781   -4.197  0.000   -17.140 -6.202
 
-data=f2_df.iloc[0:31]
-
-model = ols('cases ~ C(Minimum_Temperature) + C(Relative_Humidity)+ C(Minimum_Temperature):C(Relative_Humidity)', data).fit()
-print(model.summary())
 '''
 
+beta0, beta1, beta2, beta3, beta4= 5.039e+04, 25.0587, -2306.0375, 682.8575, -11.6713
+# Let's have a look of the data
+x2 = f2_df["min2"]
+x = f2_df["Minimum_Temperature"]
+y = f2_df["cases"]
+plt.figure(figsize = (10,8))
+plt.plot(x, y, 'b.')
+plt.plot(x, beta1*x2 + beta2*x + beta3*f2_df["Relative_Humidity"] + beta4*f2_df["min_humidity"] +beta0, 'r')
+plt.xlabel('Minimum Temperature F')
+plt.ylabel("Daily New Cases")
+plt.title("Polynomial Regression for Daily New Cases vs Minimum Temperature & Relative_Humidity & min_humidity")
+plt.savefig("Polynomial Regression for Daily New Cases vs Minimum Temperature & Relative_Humidity & min_humidity.png")
+plt.show()
 
 
 
