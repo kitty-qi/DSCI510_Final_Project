@@ -47,4 +47,10 @@ python final.py
 
 # Future Work
 
-> Given more time, what is the direction that you would want to take this project in?  
+Given more time, what is the direction that you would want to take this project in? 
+
+Since outliers occur in January and December, I would make the data in these two months into a separate model while data in the rest of the year is into another different model. Current models need to fit into the January and December data better. The predictive values giving minimum temperature in January and December are much lower than the observed values. Separating them might help me research factors that relate to covid cases. I am also interested in possible reasons for the vast differences between these two models. 
+
+What’s more, this project proves that there is a relationship between minimum temperature and covid cases. If I want to investigate further though not in a data science discipline, the next step will be to design an experiment to investigate their causal relationship for future disease prevention and decline in their transmission and break their stability. 
+
+ 
