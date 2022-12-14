@@ -29,7 +29,7 @@ pip install -r requirements.txt
 Typically, a single file is called to run the project (something along the lines of)  
 
 ```
-python code/main.py
+python final.py
 ```
 
 # Methodology
